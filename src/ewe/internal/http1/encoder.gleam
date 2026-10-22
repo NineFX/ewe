@@ -1,4 +1,3 @@
-import ewe/internal/clock
 import ewe/internal/connection
 import ewe/internal/file
 import ewe/internal/http1/connection as http1
@@ -432,7 +431,7 @@ fn append_header(
 }
 
 fn append_date(tree: bytes_tree.BytesTree) -> bytes_tree.BytesTree {
-  bytes_tree.append(tree, <<"date: ":utf8, clock.get():bits, "\r\n":utf8>>)
+  bytes_tree.append(tree, <<"date: ":utf8, date():bits, "\r\n":utf8>>)
 }
 
 fn append_connection(
@@ -525,3 +524,6 @@ pub fn error_response(status: Int) -> bytes_tree.BytesTree {
 pub fn internal_server_error() -> bytes_tree.BytesTree {
   error_response(500)
 }
+
+@external(erlang, "gnomon", "date")
+fn date() -> BitArray

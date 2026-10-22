@@ -15,10 +15,6 @@
     queue_pop/1,
     is_valid_utf8/1,
 
-    now_datetime/0,
-    set_http_date/1,
-    get_http_date/0,
-
     file_stat/1,
     file_open/1,
     file_size/1,
@@ -145,36 +141,6 @@ skip_ascii(<<Word:16>>) when Word band 16#8080 =:= 0 -> <<>>;
 skip_ascii(<<Word:8>>) when Word band 16#80 =:= 0 -> <<>>;
 skip_ascii(Rest) ->
   Rest.
-
-now_datetime() ->
-  {Date, Time} = calendar:universal_time(),
-  Weekday = calendar:day_of_the_week(Date),
-  {Weekday, Date, Time}.
-
-set_http_date(Value) ->
-  ensure_http_date_table(),
-  ets:insert(?MODULE, {http_date, Value}),
-  ok.
-
-get_http_date() ->
-  try ets:lookup(?MODULE, http_date) of
-    [{http_date, Value}] -> {ok, Value};
-    [] -> {error, nil}
-  catch
-    error:badarg -> {error, nil}
-  end.
-
-ensure_http_date_table() ->
-  case ets:info(?MODULE) of
-    undefined ->
-      try
-        ets:new(?MODULE, [set, public, named_table, {read_concurrency, true}])
-      catch
-        error:badarg -> ?MODULE
-      end;
-    _ ->
-      ?MODULE
-  end.
 
 file_stat(Path) ->
   case file:read_file_info(Path, [raw, {time, posix}]) of
