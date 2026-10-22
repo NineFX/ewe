@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Replace the `date` header clock with `gnomon`.
+
 ## v9.0.0 - 30.09.2026
 
 - Add `idle_timeout` to `Http2Options`.

@@ -1,5 +1,4 @@
 import alpacki
-import ewe/internal/clock
 import ewe/internal/connection
 import ewe/internal/file
 import ewe/internal/http2/connection as http2
@@ -1275,7 +1274,7 @@ fn send_response(
   pieces: List(outbox.Piece),
   length: ContentLength,
 ) -> State {
-  case response_fields(status, response_headers, length, clock.get()) {
+  case response_fields(status, response_headers, length, date()) {
     Error(UnsafeHeader(name)) -> {
       log_unsafe_header(name)
 
@@ -1321,7 +1320,7 @@ fn start_streaming(
 ) -> State {
   let length = content_length(stream, status, Unknown)
 
-  case response_fields(status, response_headers, length, clock.get()) {
+  case response_fields(status, response_headers, length, date()) {
     Error(UnsafeHeader(name)) -> {
       log_unsafe_header(name)
 
@@ -1879,3 +1878,6 @@ fn message_queue_length() -> Int
 
 @external(erlang, "ewe_ffi", "monotonic_ms")
 fn monotonic_ms() -> Int
+
+@external(erlang, "gnomon", "date")
+fn date() -> BitArray

@@ -40,6 +40,21 @@ pub fn handler_content_length_is_dropped_test() {
   assert string.contains(out, "content-length: 5")
 }
 
+pub fn date_is_the_current_time_test() {
+  let assert Ok(date) =
+    head([], connection.Text("hello"))
+    |> string.split("\r\n")
+    |> list.find_map(fn(line) {
+      case line {
+        "date: " <> value -> Ok(value)
+        _line -> Error(Nil)
+      }
+    })
+
+  let assert Ok(age) = date_age(date)
+  assert age >= 0 && age <= 2
+}
+
 pub fn no_content_carries_no_framing_or_body_test() {
   let #(out, remainder) = encode(204, [], connection.Text("hi"))
 
@@ -83,3 +98,6 @@ pub fn empty_chunk_is_not_framed_test() {
   assert frame(<<>>) == <<>>
     as "a zero-size chunk is the last-chunk marker and would end the body"
 }
+
+@external(erlang, "ewe_test_ffi", "date_age")
+fn date_age(date: String) -> Result(Int, Nil)
